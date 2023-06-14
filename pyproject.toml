@@ -1,0 +1,3 @@
+[tool.black]
+line-length = 120
+include = '^__init__\.py$|lib/.*\.py$'
