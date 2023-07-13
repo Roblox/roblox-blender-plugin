@@ -19,20 +19,34 @@
 # SPDX-License-Identifier: MIT
 
 """
-    Returns objects selected in any outliner by the user, only including collections and meshes.
-    For a collection to be selectable, it must contain a mesh descendant.
+    Returns objects selected in any outliner by the user, only including "uploadable" objects.
+    For a collection to be selectable, it must contain an uploadable descendant.
 """
 
 import bpy
 
+UPLOADABLE_TYPES = [
+    bpy.types.Mesh,
+    bpy.types.Armature,
+    bpy.types.Curve,
+    bpy.types.MetaBall,
+    bpy.types.Text,
+]
 
-def __is_mesh(instance):
-    return isinstance(instance, bpy.types.Object) and isinstance(instance.data, bpy.types.Mesh)
+
+def __is_uploadable_object(instance):
+    is_object = isinstance(instance, bpy.types.Object)
+    if not is_object:
+        return False
+    is_uploadable_type = any(isinstance(instance.data, uploadable_type) for uploadable_type in UPLOADABLE_TYPES)
+    return is_uploadable_type
 
 
-def __contains_mesh(collection):
+def __contains_uploadable_object(collection):
     if isinstance(collection, bpy.types.Collection):
-        return any(__is_mesh(child) for child in collection.all_objects)
+        return any(__is_uploadable_object(child) for child in collection.all_objects)
+    else:
+        return False
 
 
 def get_selected_objects(context):
@@ -55,7 +69,7 @@ def get_selected_objects(context):
                         continue
 
                     # Avoid counting objects that can't be uploaded (Open Cloud servers require a mesh inside the asset)
-                    if not (__is_mesh(selected_object) or __contains_mesh(selected_object)):
+                    if not (__is_uploadable_object(selected_object) or __contains_uploadable_object(selected_object)):
                         continue
 
                     objects.append(selected_object)
