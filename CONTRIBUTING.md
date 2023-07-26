@@ -14,9 +14,3 @@ Before marking your pull request as ready review, please ensure:
 * All python files are formatted with [black](https://pypi.org/project/black/) and the CI format check is passing
 * Any dependency changes are reflected in `requirements.txt`
 * All commit messages are complete and informative
-
-
-
-
-
-
