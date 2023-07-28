@@ -47,6 +47,13 @@ when you publish a new version of the package.
 4. This package association is tracked in Blender under the `Custom Properties` of an object or collection, where it stores the `Roblox Package ID`
 5. **To upload a previously-published asset to a new asset ID instead of uploading as a new version,** delete this `Roblox Package ID` custom property
 # CONTRIBUTING
+Roblox is providing this plugin source as a *reference* implementation. Our goal is to illustrate how Open Cloud APIs can be used to create integrations with external tools.
+
+Our hope is the community leverages this reference implementation to build their own tools and extensions. We actively encourage anybody who wishes to extend this reference implementation with new features to fork this repository and share their work with the community.
+
+As such, we will *not* be accepting Pull Requests that introduce new features or functionality. However, in the interests of ensuring this plugin remains a functional reference implementation, we will be accepting Pull Requests for bug fixes.
+
+
 ## RUNNING FROM SOURCE CODE
 Do either of the following options to install the plugin:
 
@@ -69,8 +76,18 @@ debugger during development.
 1. Zip the top-level repository folder such that the first level inside the zipped folder is another single folder containing everything
 2. Follow the steps to [install a new version](#install-new-version) using this zipped folder instead of the one from the releases page
 
+## PULL REQUESTS
+Before marking your pull request as ready for review, please ensure:
+
+- Your pull request does not introduce new features or functionality
+- All python files are formatted with [black](https://pypi.org/project/black/) and the CI format check is passing
+- Any dependency changes are reflected in `requirements.txt`
+- All commit messages are complete and informative
+- Your Pull Request includes a description of the bug and how your changes fix the bug
+
 ## CONTINUOUS INTEGRATION CHECKS
 Github Actions is set to check that formatting matches [black formatting](https://black.readthedocs.io/en/stable/index.html) before allowing a merge to `main`. Be sure to format your python code with `black` before pushing to avoid being blocked. You can use the VS Code plugin [Black Formatter by Microsoft](https://marketplace.visualstudio.com/items?itemName=ms-python.black-formatter), or run the command line tool by installing it via `pip install black` and then running `black .`
+
 ## CREATING A RELEASE
 Releases are set up to automatically generate via Github Actions when a tag is added to a commit with the format `v[0-9]+.[0-9]+.[0-9]+`. For example, you can create a release from a commit with SHA `a1b2c3d` by doing the following:
 
@@ -80,10 +97,10 @@ Or, tag the latest commit with:
 
 > `git tag -a v0.0.0 HEAD -m "My message for v0.0.0"`
 
-* where `v0.0.0` represents a [semantic versioning](https://semver.org/) naming scheme `v[major].[minor].[patch]`
-* where `[major]` gets bumped for non-backward compatible changes,
-* where `[minor]` gets bumped for backward-compatible features,
-* and where `[patch]` gets bumped for backward-compatible fixes.
+- where `v0.0.0` represents a [semantic versioning](https://semver.org/) naming scheme `v[major].[minor].[patch]`
+- where `[major]` gets bumped for non-backward compatible changes,
+- where `[minor]` gets bumped for backward-compatible features,
+- and where `[patch]` gets bumped for backward-compatible fixes.
 
 Once you've created your tag, push it to the repository with
 > `git push --tags`
