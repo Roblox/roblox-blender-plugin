@@ -72,6 +72,14 @@ def get_loop():
     return loop
 
 
+# If a new file is opened during the session the modal timer will stop
+# running. This function is called from a post load handler in this event
+# to reset the timer_running flag so the event loop can be restarted.
+def reset_timer_running():
+    global timer_running
+    timer_running = False
+
+
 def __ensure_started():
     global timer_running
 

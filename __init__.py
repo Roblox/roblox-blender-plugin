@@ -55,6 +55,7 @@ if "bpy" in locals():
         importlib.reload(RBX_OT_install_dependencies)
 
 import bpy
+from bpy.app.handlers import persistent
 from bpy.types import Panel, AddonPreferences
 from bpy.props import (
     StringProperty,
@@ -226,6 +227,13 @@ class RBX_PT_upload(RBX_PT_sidebar, Panel):
         return rbx.is_logged_in and not rbx.is_processing_login_or_logout
 
 
+@persistent
+def load_post(dummy):
+    from .lib import event_loop
+
+    event_loop.reset_timer_running()
+
+
 def get_classes():
     from .lib import (
         event_loop,
@@ -260,6 +268,7 @@ def register():
     from .lib import roblox_properties
 
     bpy.types.WindowManager.rbx = PointerProperty(type=roblox_properties.RbxProperties)
+    bpy.app.handlers.load_post.append(load_post)
 
 
 def unregister():
@@ -268,3 +277,5 @@ def unregister():
     for cls in reversed(get_classes()):
         bpy.utils.unregister_class(cls)
     del bpy.types.WindowManager.rbx
+
+    bpy.app.handlers.load_post.remove(load_post)
