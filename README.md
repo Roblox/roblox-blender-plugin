@@ -5,6 +5,9 @@ This project is licensed under the terms of the MIT license. See [LICENSE.md](ht
 
 **Roblox is providing this plugin source as a reference implementation, and we encourage the community to extend and build upon this!**
 
+https://github.com/Roblox/roblox-blender-plugin/assets/66378309/4e889d87-c0fc-4af5-b974-9eb129d16364
+
+
 # INSTALLATION
 ## UNINSTALL OLD VERSION
 1. Navigate to the add-ons menu in Blender at `Edit` > `Preferences` > `Add-ons`
