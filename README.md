@@ -5,6 +5,8 @@ This project is licensed under the terms of the MIT license. See [LICENSE.md](ht
 
 **Roblox is providing this plugin source as a reference implementation, and we encourage the community to extend and build upon this!**
 
+https://github.com/Roblox/roblox-blender-plugin/assets/66378309/4e889d87-c0fc-4af5-b974-9eb129d16364
+
 # INSTALLATION
 ## UNINSTALL OLD VERSION
 1. Navigate to the add-ons menu in Blender at `Edit` > `Preferences` > `Add-ons`
@@ -33,6 +35,7 @@ This project is licensed under the terms of the MIT license. See [LICENSE.md](ht
 4. Unless previously logged in, your browser opens and prompts for authorization
 5. In your browser, authorize creators to use in the plugin. To do this, log into your Roblox account. Then, select the account and/or groups you want to upload with. Click `CONTINUE` at the bottom of the page, then click `CONFIRM AND GIVE ACCESS`. Your browser should indicate a successful login. You can close the page and return to Blender
 6. Select the desired creator from the `Upload to:` dropdown of authorized creators
+
 ## UPLOAD
 1. Select any number of meshes or collections you want to publish at once. Each selected object will be uploaded as its own asset. If you want to publish multiple objects as a single asset, group them into a `Collection` and select the `Collection`
 2. Click `Upload`
@@ -46,6 +49,7 @@ when you publish a new version of the package.
 3. When a new version of this object is uploaded from Blender, this package will automatically update to the latest version, overwriting any modifications
 4. This package association is tracked in Blender under the `Custom Properties` of an object or collection, where it stores the `Roblox Package ID`
 5. **To upload a previously-published asset to a new asset ID instead of uploading as a new version,** delete this `Roblox Package ID` custom property
+
 # CONTRIBUTING
 Roblox is providing this plugin source as a *reference* implementation. Our goal is to illustrate how Open Cloud APIs can be used to create integrations with external tools.
 
@@ -60,25 +64,22 @@ Do either of the following options to install the plugin:
 ### OPTION 1: RECOMMENDED VS CODE DEVELOPMENT WORKFLOW
 This option allows you to quickly iterate on the codebase and reload the plugin for testing changes, as well as use a
 debugger during development.
-
 1. Be sure to [uninstall any plugin zip file](#uninstall-old-version) first, and then close Blender
-1. Open VS Code as administrator to allow the Blender Development plugin to install a debugger for Blender _(Only need to do this the first time)_
-2. Install the VS Code extension [JacquesLucke.blender-development](https://marketplace.visualstudio.com/items?itemName=JacquesLucke.blender-development)
-3. Open the repository in VS Code
-4. Open the command window (`ctrl`/`⌘` + `shift` + `p`)
-5. Run the `> Blender: Build and Start` command 
-6. Select your Blender executable file
-7. The plugin is now running in Blender with a debugger attached
-8. If saving a file does not auto-reload the plugin, you can manually reload the plugin with `> Blender: Reload Addons`
+2. Open VS Code as administrator to allow the Blender Development plugin to install a debugger for Blender _(Only need to do this the first time)_
+3. Install the VS Code extension [JacquesLucke.blender-development](https://marketplace.visualstudio.com/items?itemName=JacquesLucke.blender-development)
+4. Open the repository in VS Code
+5. Open the command window (`ctrl`/`⌘` + `shift` + `p`)
+6. Run the `> Blender: Build and Start` command 
+7. Select your Blender executable file
+8. The plugin is now running in Blender with a debugger attached
+9. If saving a file does not auto-reload the plugin, you can manually reload the plugin with `> Blender: Reload Addons`
 
 ### OPTION 2: INSTALL MANUALLY
-
 1. Zip the top-level repository folder such that the first level inside the zipped folder is another single folder containing everything
 2. Follow the steps to [install a new version](#install-new-version) using this zipped folder instead of the one from the releases page
 
 ## PULL REQUESTS
 Before marking your pull request as ready for review, please ensure:
-
 - Your pull request does not introduce new features or functionality
 - All python files are formatted with [black](https://pypi.org/project/black/) and the CI format check is passing
 - Any dependency changes are reflected in `requirements.txt`
