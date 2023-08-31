@@ -15,6 +15,8 @@ https://github.com/Roblox/roblox-blender-plugin/assets/66378309/ba8b1bd9-e431-40
 4. Restart Blender after uninstalling
 
 ## INSTALL NEW VERSION
+Prerequisite: Blender version 3.2 or greater is required
+
 1. Be sure to [uninstall any old version](#uninstall-old-version) first, including restarting Blender afterward
 2. Download the latest add-on zip file from the [repository releases page](https://github.com/Roblox/roblox-blender-plugin/releases)
 3. Navigate to the add-ons menu in Blender at `Edit` > `Preferences` > `Add-ons`
