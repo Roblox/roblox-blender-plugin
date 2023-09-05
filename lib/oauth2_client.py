@@ -72,7 +72,7 @@ from contextlib import asynccontextmanager
 from time import time
 
 
-PORT = 8080
+PORT = 8181
 HOST = "localhost"
 RESPONSE_TYPE = "code"
 CODE_CHALLENGE_METHOD = "S256"
