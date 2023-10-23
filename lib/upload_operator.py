@@ -217,7 +217,7 @@ class RBX_OT_upload(Operator):
                 asset_description=constants.ASSET_DESCRIPTION,
                 file_path=file_path,
                 asset_id=package_id or NO_ASSET_ID,
-                upload_request_timeout_seconds = 25,
+                upload_request_timeout_seconds=25,
             )
 
         return operation
