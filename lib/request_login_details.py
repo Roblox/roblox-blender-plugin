@@ -75,8 +75,8 @@ async def request_login_details(token_data):
     # Raises jwt.exceptions.DecodeError
     profile_data = await __decode_id_token(token_data.get("id_token"))
 
-    # Raises KeyError if missing preferred_username
-    preferred_username = profile_data["preferred_username"]
+    # Raises KeyError if missing name
+    name = profile_data["name"]
 
     token_data = {
         "refresh_after": time() + token_data["expires_in"] - REFRESH_SECONDS_BEFORE_EXPIRY,
@@ -85,7 +85,7 @@ async def request_login_details(token_data):
         "id_token": token_data["id_token"],
     }
 
-    return creator_ids, preferred_username, group_names_by_id, token_data
+    return creator_ids, name, group_names_by_id, token_data
 
 
 async def __request_authorized_resources(access_token):
