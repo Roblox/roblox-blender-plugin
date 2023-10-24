@@ -181,7 +181,7 @@ class RBX_PT_creator(RBX_PT_sidebar, Panel):
                 from .lib.oauth2_client import RbxOAuth2Client
 
                 oauth2_client = RbxOAuth2Client(rbx)
-                top_row.label(text=f"Hello, {oauth2_client.preferred_username}")
+                top_row.label(text=f"Hello, {oauth2_client.name}")
             except Exception as exception:
                 self.report({"ERROR"}, f"{str(exception)}\n{traceback.format_exc()}")
 
