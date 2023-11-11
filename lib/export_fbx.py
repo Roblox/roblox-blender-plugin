@@ -61,6 +61,13 @@ def export_fbx(scene, view_layer, target_object, exported_file_path, preferences
         bpy.ops.export_scene.fbx(
             filepath=str(exported_file_path),
             global_scale=preferences.export_scale,
+            bake_anim=preferences.bake_anim,
+            bake_anim_use_all_bones = preferences.bake_anim_use_all_bones,
+            bake_anim_use_nla_strips = preferences.bake_anim_use_nla_strips,
+            bake_anim_use_all_actions = preferences.bake_anim_use_all_actions,
+            bake_anim_force_startend_keying = preferences.bake_anim_force_startend_keying,
+            bake_anim_step = preferences.bake_anim_step,
+            bake_anim_simplify_factor = preferences.bake_anim_simplify_factor,
             axis_forward="-Z",
             axis_up="Y",
             path_mode="COPY",

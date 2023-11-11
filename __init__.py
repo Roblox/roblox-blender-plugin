@@ -62,6 +62,7 @@ from bpy.props import (
     PointerProperty,
     FloatProperty,
     IntProperty,
+    BoolProperty,
 )
 
 import traceback
@@ -99,9 +100,66 @@ class RbxAddonPreferences(AddonPreferences):
         step=0.01,
         description=f"Global scale applied to objects during export for upload.\nDEFAULT: {constants.DEFAULT_EXPORT_SCALE} (Blender Meters are 100:1 to Studio Studs)",
     )
+    bake_anim: BoolProperty(
+        name="Baked Animation",
+        description="Export baked keyframe animation",
+        default=True,
+    )
+    bake_anim_use_all_bones: BoolProperty(
+        name="Key All Bones",
+        description="Force exporting at least one key of animation for all bones "
+        "(needed with some target applications, like UE4)",
+        default=True,
+    )
+    bake_anim_use_nla_strips: BoolProperty(
+        name="NLA Strips",
+        description="Export each non-muted NLA strip as a separated FBX's AnimStack, if any, "
+        "instead of global scene animation",
+        default=True,
+    )
+    bake_anim_use_all_actions: BoolProperty(
+        name="All Actions",
+        description="Export each action as a separated FBX's AnimStack, instead of global scene animation "
+        "(note that animated objects will get all actions compatible with them, "
+        "others will get no animation at all)",
+        default=True,
+    )
+    bake_anim_force_startend_keying: BoolProperty(
+        name="Force Start/End Keying",
+        description="Always add a keyframe at start and end of actions for animated channels",
+        default=True,
+    )
+    bake_anim_step: FloatProperty(
+        name="Sampling Rate",
+        description="How often to evaluate animated values (in frames)",
+        min=0.01,
+        max=100.0,
+        soft_min=0.1,
+        soft_max=10.0,
+        default=1.0,
+    )
+    bake_anim_simplify_factor: FloatProperty(
+        name="Simplify",
+        description="How much to simplify baked values (0.0 to disable, the higher the more simplified)",
+        min=0.0,
+        max=100.0,  # No simplification to up to 10% of current magnitude tolerance.
+        soft_min=0.0,
+        soft_max=10.0,
+        default=1.0,  # default: min slope: 0.005, max frame step: 10.
+    )
 
     def draw(self, context):
         self.layout.prop(self, "export_scale")
+        self.layout.prop(self, "bake_anim", text="Bake Animation")
+        bake_anim_box = self.layout.box()
+        bake_anim_box.use_property_split = True
+        bake_anim_box.enabled = self.bake_anim
+        bake_anim_box.prop(self, "bake_anim_use_all_bones")
+        bake_anim_box.prop(self, "bake_anim_use_nla_strips")
+        bake_anim_box.prop(self, "bake_anim_use_all_actions")
+        bake_anim_box.prop(self, "bake_anim_force_startend_keying")
+        bake_anim_box.prop(self, "bake_anim_step")
+        bake_anim_box.prop(self, "bake_anim_simplify_factor")
 
 
 class RBX_PT_sidebar:
@@ -125,7 +183,9 @@ class RBX_PT_main(RBX_PT_sidebar, Panel):
                 text=f"Required: Blender {'.'.join(str(v) for v in required_version)} or newer",
                 icon="DOT",
             )
-            layout.row().label(text=f"Your version: Blender {bpy.app.version_string}", icon="X")
+            layout.row().label(
+                text=f"Your version: Blender {bpy.app.version_string}", icon="X"
+            )
             return
 
         from .lib import install_dependencies
@@ -133,12 +193,15 @@ class RBX_PT_main(RBX_PT_sidebar, Panel):
         rbx = context.window_manager.rbx
         if not rbx.is_finished_installing_dependencies:
             layout.row().label(
-                text=f"This plugin requires installation of dependencies the first time it is run.", icon="INFO"
+                text=f"This plugin requires installation of dependencies the first time it is run.",
+                icon="INFO",
             )
 
             layout.row().operator(
                 install_dependencies.RBX_OT_install_dependencies.bl_idname,
-                text="Installing..." if rbx.is_installing_dependencies else "Install Dependencies",
+                text="Installing..."
+                if rbx.is_installing_dependencies
+                else "Install Dependencies",
             )
             return
 
@@ -153,17 +216,25 @@ class RBX_PT_main(RBX_PT_sidebar, Panel):
         if not rbx.has_called_load_creator:
             from .lib import creator_details
 
-            creator_details.load_creator_details(context.window_manager, context.preferences)
+            creator_details.load_creator_details(
+                context.window_manager, context.preferences
+            )
 
         if not rbx.is_logged_in:
             from .lib import oauth2_login_operators
 
-            button_text = "Logging in..." if rbx.is_processing_login_or_logout else "Log in"
-            layout.row().operator(oauth2_login_operators.RBX_OT_oauth2_login.bl_idname, text=button_text)
+            button_text = (
+                "Logging in..." if rbx.is_processing_login_or_logout else "Log in"
+            )
+            layout.row().operator(
+                oauth2_login_operators.RBX_OT_oauth2_login.bl_idname, text=button_text
+            )
 
             # This cancel button renders for logins requiring the browser, but not for automatic logins via refreshing a remembered token
             if bpy.ops.rbx.oauth2_cancel_login.poll():
-                layout.row().operator(oauth2_login_operators.RBX_OT_oauth2_cancel_login.bl_idname)
+                layout.row().operator(
+                    oauth2_login_operators.RBX_OT_oauth2_cancel_login.bl_idname
+                )
 
 
 class RBX_PT_creator(RBX_PT_sidebar, Panel):
@@ -188,7 +259,9 @@ class RBX_PT_creator(RBX_PT_sidebar, Panel):
         from .lib import oauth2_login_operators
 
         button_text = "Working..." if rbx.is_processing_login_or_logout else "Log out"
-        top_row.operator(oauth2_login_operators.RBX_OT_oauth2_logout.bl_idname, text=button_text)
+        top_row.operator(
+            oauth2_login_operators.RBX_OT_oauth2_logout.bl_idname, text=button_text
+        )
 
         if not rbx.is_processing_login_or_logout:
             layout.prop(rbx, "creator")
