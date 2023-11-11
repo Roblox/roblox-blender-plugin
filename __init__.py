@@ -183,9 +183,7 @@ class RBX_PT_main(RBX_PT_sidebar, Panel):
                 text=f"Required: Blender {'.'.join(str(v) for v in required_version)} or newer",
                 icon="DOT",
             )
-            layout.row().label(
-                text=f"Your version: Blender {bpy.app.version_string}", icon="X"
-            )
+            layout.row().label(text=f"Your version: Blender {bpy.app.version_string}", icon="X")
             return
 
         from .lib import install_dependencies
@@ -199,9 +197,7 @@ class RBX_PT_main(RBX_PT_sidebar, Panel):
 
             layout.row().operator(
                 install_dependencies.RBX_OT_install_dependencies.bl_idname,
-                text="Installing..."
-                if rbx.is_installing_dependencies
-                else "Install Dependencies",
+                text="Installing..." if rbx.is_installing_dependencies else "Install Dependencies",
             )
             return
 
@@ -216,25 +212,17 @@ class RBX_PT_main(RBX_PT_sidebar, Panel):
         if not rbx.has_called_load_creator:
             from .lib import creator_details
 
-            creator_details.load_creator_details(
-                context.window_manager, context.preferences
-            )
+            creator_details.load_creator_details(context.window_manager, context.preferences)
 
         if not rbx.is_logged_in:
             from .lib import oauth2_login_operators
 
-            button_text = (
-                "Logging in..." if rbx.is_processing_login_or_logout else "Log in"
-            )
-            layout.row().operator(
-                oauth2_login_operators.RBX_OT_oauth2_login.bl_idname, text=button_text
-            )
+            button_text = "Logging in..." if rbx.is_processing_login_or_logout else "Log in"
+            layout.row().operator(oauth2_login_operators.RBX_OT_oauth2_login.bl_idname, text=button_text)
 
             # This cancel button renders for logins requiring the browser, but not for automatic logins via refreshing a remembered token
             if bpy.ops.rbx.oauth2_cancel_login.poll():
-                layout.row().operator(
-                    oauth2_login_operators.RBX_OT_oauth2_cancel_login.bl_idname
-                )
+                layout.row().operator(oauth2_login_operators.RBX_OT_oauth2_cancel_login.bl_idname)
 
 
 class RBX_PT_creator(RBX_PT_sidebar, Panel):
@@ -259,9 +247,7 @@ class RBX_PT_creator(RBX_PT_sidebar, Panel):
         from .lib import oauth2_login_operators
 
         button_text = "Working..." if rbx.is_processing_login_or_logout else "Log out"
-        top_row.operator(
-            oauth2_login_operators.RBX_OT_oauth2_logout.bl_idname, text=button_text
-        )
+        top_row.operator(oauth2_login_operators.RBX_OT_oauth2_logout.bl_idname, text=button_text)
 
         if not rbx.is_processing_login_or_logout:
             layout.prop(rbx, "creator")
