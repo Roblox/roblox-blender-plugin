@@ -73,6 +73,8 @@ def export_fbx(scene, view_layer, target_object, exported_file_path, preferences
             path_mode="COPY",
             embed_textures=True,
             use_active_collection=True,
+            add_leaf_bones=preferences.add_leaf_bones,
+            use_custom_props=preferences.use_custom_props,
         )
     finally:
         # Return to the previous active LayerCollection
