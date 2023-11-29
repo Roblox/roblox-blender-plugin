@@ -147,9 +147,30 @@ class RbxAddonPreferences(AddonPreferences):
         soft_max=10.0,
         default=1.0,  # default: min slope: 0.005, max frame step: 10.
     )
+    add_leaf_bones: BoolProperty(
+        name="Add Leaf Bones",
+        description="Append a final bone to the end of each chain to specify last bone length (use this when you intend to edit the armature from exported data)",
+        default=True,
+    )
+    use_custom_props: BoolProperty(
+        name="Custom Properties",
+        description="Export Custom Properties",
+        default=True,
+    )
 
     def draw(self, context):
-        self.layout.prop(self, "export_scale")
+        self.layout.label(text="Include")
+        include_box = self.layout.box()
+        include_box.prop(self, "use_custom_props")
+
+        self.layout.label(text="Transform")
+        transform_box = self.layout.box()
+        transform_box.prop(self, "export_scale")
+
+        self.layout.label(text="Armature")
+        armature_box = self.layout.box()
+        armature_box.prop(self, "add_leaf_bones")
+
         self.layout.prop(self, "bake_anim", text="Bake Animation")
         bake_anim_box = self.layout.box()
         bake_anim_box.use_property_split = True
