@@ -61,17 +61,21 @@ def get_selected_objects(context):
         if area == current_area:
             continue
         if area.type == "OUTLINER" or area.type == "VIEW_3D":
-            # Temporary context override requires Blender version >= 3.2.0
-            with context.temp_override(area=area):
-                for selected_object in context.selected_ids:
-                    # Avoid double-counting objects that are selected in multiple outliners
-                    if selected_object in objects:
-                        continue
+            for region in area.regions:
+                if region.type == "WINDOW":
+                    # Temporary context override requires Blender version >= 3.2.0
+                    with context.temp_override(area=area, region=region):
+                        for selected_object in context.selected_ids:
+                            # Avoid double-counting objects that are selected in multiple outliners
+                            if selected_object in objects:
+                                continue
 
-                    # Avoid counting objects that can't be uploaded (Open Cloud servers require a mesh inside the asset)
-                    if not (__is_uploadable_object(selected_object) or __contains_uploadable_object(selected_object)):
-                        continue
+                            # Avoid counting objects that can't be uploaded (Open Cloud servers require a mesh inside the asset)
+                            if not (
+                                __is_uploadable_object(selected_object) or __contains_uploadable_object(selected_object)
+                            ):
+                                continue
 
-                    objects.append(selected_object)
+                            objects.append(selected_object)
 
     return objects
