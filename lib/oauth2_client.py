@@ -72,7 +72,7 @@ from contextlib import asynccontextmanager
 from time import time
 
 
-PORT = 8080
+PORT = 8181
 HOST = "localhost"
 RESPONSE_TYPE = "code"
 CODE_CHALLENGE_METHOD = "S256"
@@ -249,10 +249,10 @@ class RbxOAuth2Client:
 
                 self.__complete_login(*await request_login_details(new_token_data))
 
-    def __complete_login(self, creator_ids, preferred_username, group_names_by_id, token_data):
+    def __complete_login(self, creator_ids, name, group_names_by_id, token_data):
         # Set state values in rbx from the data fetched and processed above
-        self.__set_creators_from_ids(creator_ids, preferred_username, group_names_by_id)
-        self.preferred_username = preferred_username
+        self.__set_creators_from_ids(creator_ids, name, group_names_by_id)
+        self.name = name
         self.token_data = token_data
         self.rbx.is_logged_in = True
 
@@ -321,7 +321,7 @@ class RbxOAuth2Client:
                         exception.message = error_description
                     raise exception
 
-    def __set_creators_from_ids(self, creator_ids, preferred_username, group_names_by_id):
+    def __set_creators_from_ids(self, creator_ids, name, group_names_by_id):
         """Populates a CollectionProperty with RbxCreatorData objects containing creator types, ids, and names
         given ids and names. Used for persisting creator data across sessions and generating enum dropdown items.
         """
@@ -332,7 +332,7 @@ class RbxOAuth2Client:
                 creator = self.rbx.creators.add()
                 creator.type = "USER"
                 creator.id = creator_ids["user"]
-                creator.name = preferred_username
+                creator.name = name
 
             for group_id in creator_ids["groups"]:
                 creator = self.rbx.creators.add()

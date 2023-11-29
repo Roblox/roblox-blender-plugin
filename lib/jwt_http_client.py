@@ -49,7 +49,7 @@ class JWTHTTPClient(HTTPClient):
         :return: The JSON data as a dictionary.
         :raise JWTHTTPFetchError: If there's a problem fetching or decoding the data.
         """
-        if not (url.startswith("https://") or url.startswith("http://")):
+        if not url.startswith("https://"):
             raise JWTHTTPFetchError("Unsupported protocol in 'iss'")
 
         try:

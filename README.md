@@ -5,7 +5,7 @@ This project is licensed under the terms of the MIT license. See [LICENSE.md](ht
 
 **Roblox is providing this plugin source as a reference implementation, and we encourage the community to extend and build upon this!**
 
-https://github.com/Roblox/roblox-blender-plugin/assets/66378309/4e889d87-c0fc-4af5-b974-9eb129d16364
+https://github.com/Roblox/roblox-blender-plugin/assets/66378309/ba8b1bd9-e431-409d-b336-9cb046e00886
 
 # INSTALLATION
 ## UNINSTALL OLD VERSION
@@ -15,6 +15,8 @@ https://github.com/Roblox/roblox-blender-plugin/assets/66378309/4e889d87-c0fc-4a
 4. Restart Blender after uninstalling
 
 ## INSTALL NEW VERSION
+Prerequisite: Blender version 3.2 or greater is required
+
 1. Be sure to [uninstall any old version](#uninstall-old-version) first, including restarting Blender afterward
 2. Download the latest add-on zip file from the [repository releases page](https://github.com/Roblox/roblox-blender-plugin/releases)
 3. Navigate to the add-ons menu in Blender at `Edit` > `Preferences` > `Add-ons`

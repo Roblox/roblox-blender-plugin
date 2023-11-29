@@ -62,6 +62,7 @@ from bpy.props import (
     PointerProperty,
     FloatProperty,
     IntProperty,
+    BoolProperty,
 )
 
 import traceback
@@ -99,9 +100,66 @@ class RbxAddonPreferences(AddonPreferences):
         step=0.01,
         description=f"Global scale applied to objects during export for upload.\nDEFAULT: {constants.DEFAULT_EXPORT_SCALE} (Blender Meters are 100:1 to Studio Studs)",
     )
+    bake_anim: BoolProperty(
+        name="Baked Animation",
+        description="Export baked keyframe animation",
+        default=True,
+    )
+    bake_anim_use_all_bones: BoolProperty(
+        name="Key All Bones",
+        description="Force exporting at least one key of animation for all bones "
+        "(needed with some target applications, like UE4)",
+        default=True,
+    )
+    bake_anim_use_nla_strips: BoolProperty(
+        name="NLA Strips",
+        description="Export each non-muted NLA strip as a separated FBX's AnimStack, if any, "
+        "instead of global scene animation",
+        default=True,
+    )
+    bake_anim_use_all_actions: BoolProperty(
+        name="All Actions",
+        description="Export each action as a separated FBX's AnimStack, instead of global scene animation "
+        "(note that animated objects will get all actions compatible with them, "
+        "others will get no animation at all)",
+        default=True,
+    )
+    bake_anim_force_startend_keying: BoolProperty(
+        name="Force Start/End Keying",
+        description="Always add a keyframe at start and end of actions for animated channels",
+        default=True,
+    )
+    bake_anim_step: FloatProperty(
+        name="Sampling Rate",
+        description="How often to evaluate animated values (in frames)",
+        min=0.01,
+        max=100.0,
+        soft_min=0.1,
+        soft_max=10.0,
+        default=1.0,
+    )
+    bake_anim_simplify_factor: FloatProperty(
+        name="Simplify",
+        description="How much to simplify baked values (0.0 to disable, the higher the more simplified)",
+        min=0.0,
+        max=100.0,  # No simplification to up to 10% of current magnitude tolerance.
+        soft_min=0.0,
+        soft_max=10.0,
+        default=1.0,  # default: min slope: 0.005, max frame step: 10.
+    )
 
     def draw(self, context):
         self.layout.prop(self, "export_scale")
+        self.layout.prop(self, "bake_anim", text="Bake Animation")
+        bake_anim_box = self.layout.box()
+        bake_anim_box.use_property_split = True
+        bake_anim_box.enabled = self.bake_anim
+        bake_anim_box.prop(self, "bake_anim_use_all_bones")
+        bake_anim_box.prop(self, "bake_anim_use_nla_strips")
+        bake_anim_box.prop(self, "bake_anim_use_all_actions")
+        bake_anim_box.prop(self, "bake_anim_force_startend_keying")
+        bake_anim_box.prop(self, "bake_anim_step")
+        bake_anim_box.prop(self, "bake_anim_simplify_factor")
 
 
 class RBX_PT_sidebar:
@@ -133,7 +191,8 @@ class RBX_PT_main(RBX_PT_sidebar, Panel):
         rbx = context.window_manager.rbx
         if not rbx.is_finished_installing_dependencies:
             layout.row().label(
-                text=f"This plugin requires installation of dependencies the first time it is run.", icon="INFO"
+                text=f"This plugin requires installation of dependencies the first time it is run.",
+                icon="INFO",
             )
 
             layout.row().operator(
@@ -181,7 +240,7 @@ class RBX_PT_creator(RBX_PT_sidebar, Panel):
                 from .lib.oauth2_client import RbxOAuth2Client
 
                 oauth2_client = RbxOAuth2Client(rbx)
-                top_row.label(text=f"Hello, {oauth2_client.preferred_username}")
+                top_row.label(text=f"Hello, {oauth2_client.name}")
             except Exception as exception:
                 self.report({"ERROR"}, f"{str(exception)}\n{traceback.format_exc()}")
 

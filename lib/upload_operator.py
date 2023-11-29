@@ -217,6 +217,7 @@ class RBX_OT_upload(Operator):
                 asset_description=constants.ASSET_DESCRIPTION,
                 file_path=file_path,
                 asset_id=package_id or NO_ASSET_ID,
+                upload_request_timeout_seconds=25,
             )
 
         return operation
@@ -236,6 +237,7 @@ class RBX_OT_upload(Operator):
         property and cleaning up from the operation."""
         from . import status_indicators, constants
         import openapi_client
+        import asyncio
 
         try:
             operation = task.result()
@@ -247,7 +249,7 @@ class RBX_OT_upload(Operator):
             elif not operation.done:
                 # Timeout while polling for upload job to finish. It may yet finish or fail, but we stopped checking.
                 status_indicators.set_status(
-                    window_manager, area, target_object, constants.ERROR_MESSAGES["TIMED_OUT"], "ERROR"
+                    window_manager, area, target_object, constants.ERROR_MESSAGES["OPERATION_TIMED_OUT"], "ERROR"
                 )
             elif operation.response:
                 # Success
@@ -265,7 +267,11 @@ class RBX_OT_upload(Operator):
                     window_manager, area, target_object, constants.ERROR_MESSAGES["INVALID_RESPONSE"], "ERROR"
                 )
                 print(f"Upload failed, invalid response:\n{operation}")
-
+        except asyncio.exceptions.TimeoutError as exception:
+            # Timeout while waiting for initial upload to return an operation ID. It may yet finish or fail, but we stopped waiting.
+            status_indicators.set_status(
+                window_manager, area, target_object, constants.ERROR_MESSAGES["UPLOAD_TIMED_OUT"], "ERROR"
+            )
         except openapi_client.rest.ApiException as exception:
             traceback.print_exception(exception)
             from .extract_exception_message import extract_exception_message
