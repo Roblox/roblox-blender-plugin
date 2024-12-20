@@ -150,7 +150,8 @@ class RBX_OT_upload(Operator):
 
             add_on_preferences = get_add_on_preferences(preferences)
             temporary_directory = TemporaryDirectory()
-            exported_file_path = Path(temporary_directory.name) / f"{target_object.name}.fbx"
+            sanitized_object_name = "".join(c for c in target_object.name if c.isalnum() or c in (' ','.','_')).rstrip()
+            exported_file_path = Path(temporary_directory.name) / f"exported_{sanitized_object_name}.fbx"
             from .export_fbx import export_fbx
 
             export_fbx(scene, view_layer, target_object, exported_file_path, add_on_preferences)
