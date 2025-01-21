@@ -150,7 +150,9 @@ class RBX_OT_upload(Operator):
 
             add_on_preferences = get_add_on_preferences(preferences)
             temporary_directory = TemporaryDirectory()
-            sanitized_object_name = "".join(c for c in target_object.name if c.isalnum() or c in (' ','.','_')).rstrip()
+            sanitized_object_name = "".join(
+                c for c in target_object.name if c.isalnum() or c in (" ", ".", "_")
+            ).rstrip()
             exported_file_path = Path(temporary_directory.name) / f"exported_{sanitized_object_name}.fbx"
             from .export_fbx import export_fbx
 
