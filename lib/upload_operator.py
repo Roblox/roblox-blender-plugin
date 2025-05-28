@@ -30,8 +30,8 @@ if "bpy" in locals():
         importlib.reload(creator_details)
     if "status_indicators" in locals():
         importlib.reload(status_indicators)
-    if "export_fbx" in locals():
-        importlib.reload(export_fbx)
+    if "export_gltf" in locals():
+        importlib.reload(export_gltf)
     if "get_add_on_preferences" in locals():
         importlib.reload(get_add_on_preferences)
     if "RbxOAuth2Client" in locals():
@@ -139,9 +139,9 @@ class RBX_OT_upload(Operator):
 
     @classmethod
     def upload(cls, window_manager, area, scene, view_layer, preferences, target_object):
-        """Exports the given object to a FBX file, and uploads it to Roblox"""
+        """Exports the given object to a file, and uploads it to Roblox"""
 
-        # FBX exporting occurs on the main thread so we are not scheduling it to be run
+        # Exporting occurs on the main thread so we are not scheduling it to be run
         # asynchronously along with the upload web requests
         from . import status_indicators, constants
 
@@ -153,10 +153,10 @@ class RBX_OT_upload(Operator):
             sanitized_object_name = "".join(
                 c for c in target_object.name if c.isalnum() or c in (" ", ".", "_")
             ).rstrip()
-            exported_file_path = Path(temporary_directory.name) / f"exported_{sanitized_object_name}.fbx"
-            from .export_fbx import export_fbx
+            exported_file_path = Path(temporary_directory.name) / f"exported_{sanitized_object_name}"
+            from .export import export_gltf
 
-            export_fbx(scene, view_layer, target_object, exported_file_path, add_on_preferences)
+            exported_file_path = export_gltf(scene, view_layer, target_object, exported_file_path, add_on_preferences)
         except Exception as exception:
             traceback.print_exception(exception)
             status_indicators.set_status(
@@ -183,7 +183,7 @@ class RBX_OT_upload(Operator):
     # This asynchronous method is invoked as a separate coroutine from the main thread
     @classmethod
     async def upload_task(cls, window_manager, area, target_object, file_path, package_id):
-        """Uploads the given fbx file to Roblox, and yields until it has finished processing or timed out"""
+        """Uploads the given exported file to Roblox, and yields until it has finished processing or timed out"""
         from .oauth2_client import RbxOAuth2Client
         from . import creator_details, constants
 

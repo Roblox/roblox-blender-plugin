@@ -20,7 +20,6 @@
 
 """Constant variable configs that are required across modules"""
 
-DEFAULT_EXPORT_SCALE = 0.01  # Blender Meters are 100:1 to Studio Studs
 RBX_PACKAGE_ID_PROPERTY_NAME = "Roblox Package ID"
 ASSET_DESCRIPTION = "Uploaded from Blender"
 ERROR_MESSAGES = {
