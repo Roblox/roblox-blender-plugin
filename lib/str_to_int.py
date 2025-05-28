@@ -24,5 +24,5 @@ def str_to_int(string, *, default=None):
     otherwise returns default"""
     try:
         return int(string)
-    except TypeError:
+    except ValueError:
         return default
