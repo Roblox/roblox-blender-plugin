@@ -79,6 +79,10 @@ bl_info = {
 }
 
 
+required_version = bl_info.get("blender")
+is_blender_version_supported = bpy.app.version >= required_version
+
+
 class RbxAddonPreferences(AddonPreferences):
     """AddOnPreferences that are serialized between Blender sessions"""
 
@@ -197,8 +201,7 @@ class RBX_PT_main(RBX_PT_sidebar, Panel):
 
     def draw(self, context):
         layout = self.layout
-        required_version = bl_info.get("blender")
-        if bpy.app.version < required_version:
+        if not is_blender_version_supported:
             layout.row().label(text="Please update Blender!", icon="ERROR")
             layout.row().label(
                 text=f"Required: Blender {'.'.join(str(v) for v in required_version)} or newer",
@@ -315,6 +318,9 @@ def load_post(dummy):
 
 
 def get_classes():
+    if not is_blender_version_supported:
+        return (RBX_PT_main,)
+
     from .lib import (
         event_loop,
         creator_details,
@@ -345,10 +351,11 @@ def register():
     for cls in get_classes():
         bpy.utils.register_class(cls)
 
-    from .lib import roblox_properties
+    if is_blender_version_supported:
+        from .lib import roblox_properties
 
-    bpy.types.WindowManager.rbx = PointerProperty(type=roblox_properties.RbxProperties)
-    bpy.app.handlers.load_post.append(load_post)
+        bpy.types.WindowManager.rbx = PointerProperty(type=roblox_properties.RbxProperties)
+        bpy.app.handlers.load_post.append(load_post)
 
 
 def unregister():
@@ -356,6 +363,7 @@ def unregister():
     # another still depends on it
     for cls in reversed(get_classes()):
         bpy.utils.unregister_class(cls)
-    del bpy.types.WindowManager.rbx
 
-    bpy.app.handlers.load_post.remove(load_post)
+    if is_blender_version_supported:
+        del bpy.types.WindowManager.rbx
+        bpy.app.handlers.load_post.remove(load_post)
