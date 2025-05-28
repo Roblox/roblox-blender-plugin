@@ -91,6 +91,7 @@ def export_gltf(scene, view_layer, target_object, exported_file_path, preference
         export_vertex_color=preferences.export_vertex_color,
         export_all_vertex_colors=preferences.export_all_vertex_colors,
         export_active_vertex_color_when_no_material=preferences.export_active_vertex_color_when_no_material,
+        export_extras=preferences.export_extras,
         export_yup=preferences.export_yup,
         export_apply=preferences.export_apply,
         export_shared_accessors=preferences.export_shared_accessors,
