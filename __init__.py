@@ -77,7 +77,7 @@ bl_info = {
     "name": "Upload to Roblox",
     "author": "Roblox",
     "description": "Uses Roblox's Open Cloud API to upload selected assets from Blender to Roblox",
-    "blender": (4, 1, 0),
+    "blender": (4, 2, 0),
     "version": (0, 0, 0),  # Gets updated by Github Actions. See README for info
     "location": "View3D",
     "warning": "",
