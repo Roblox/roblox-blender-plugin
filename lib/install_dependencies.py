@@ -69,6 +69,9 @@ class RBX_OT_install_dependencies(Operator):
                 except Exception as cleanup_exception:
                     # If public_dependencies can't be cleaned up, this add-on gets into a bad state because it uses
                     # presence of this directory to determine if dependencies are installed.
+                    # In such a case, the user will either need to manually remove the directory,
+                    # use the Reinstall Dependencies button in addon preferences,
+                    # or reinstall the add-on.
                     traceback.print_exception(f"Error removing dependencies_public directory: {cleanup_exception}")
                 traceback.print_exception(f"Error installing dependencies: {installation_exception}")
 
