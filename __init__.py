@@ -77,7 +77,7 @@ bl_info = {
     "name": "Upload to Roblox",
     "author": "Roblox",
     "description": "Uses Roblox's Open Cloud API to upload selected assets from Blender to Roblox",
-    "blender": (3, 2, 0),
+    "blender": (4, 4, 0),
     "version": (0, 0, 0),  # Gets updated by Github Actions. See README for info
     "location": "View3D",
     "warning": "",
@@ -96,6 +96,9 @@ class RbxAddonPreferences(GltfExportPreferences):
     """AddOnPreferences that are serialized between Blender sessions"""
 
     bl_idname = __name__
+
+    # These properties are not editable via preferences UI, they get reflected to and from properties in memory.
+    # The only token we need to persist is the refresh token, since it gives all new tokens in the next session
     refresh_token: StringProperty()
     selected_creator_enum_index: IntProperty()
 
