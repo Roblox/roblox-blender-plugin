@@ -141,7 +141,13 @@ class GltfExportPreferences(AddonPreferences):
         description="When there is no material on object, export active vertex color",
         default=True,
     )
+
+    export_extras: BoolProperty(
+        name="Custom Properties", description="Export custom properties as glTF extras", default=True
+    )
+
     export_yup: BoolProperty(name="+Y Up", description="Export using glTF convention, +Y up", default=True)
+
     export_apply: BoolProperty(
         name="Apply Modifiers",
         description="Apply modifiers (excluding Armatures) to mesh objects -" "WARNING: prevents exporting shape keys",
@@ -382,10 +388,17 @@ class GltfExportPreferences(AddonPreferences):
         operator = self
         layout = self.layout
         layout.use_property_split = True
-
+        export_panel_include(layout, operator)
         export_panel_transform(layout, operator)
         export_panel_data(layout, operator)
         export_panel_animation(layout, operator)
+
+
+def export_panel_include(layout, operator):
+    header, body = layout.panel("GLTF_export_include", default_closed=True)
+    header.label(text="Include")
+    if body:
+        body.prop(operator, "export_extras")
 
 
 def export_panel_transform(layout, operator):
