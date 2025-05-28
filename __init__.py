@@ -1,7 +1,7 @@
 # Copyright © 2023 Roblox Corporation
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
-# associated documentation files (the “Software”), to deal in the Software without restriction,
+# associated documentation files (the "Software"), to deal in the Software without restriction,
 # including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
 # and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do
 # so, subject to the following conditions:
@@ -9,7 +9,7 @@
 # The above copyright notice and this permission notice shall be included in all copies or substantial
 # portions of the Software.
 
-# THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 # IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
 # FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS
 # OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY
@@ -53,17 +53,23 @@ if "bpy" in locals():
         importlib.reload(creator_details)
     if "RBX_OT_install_dependencies" in locals():
         importlib.reload(RBX_OT_install_dependencies)
+    if "export_properties" in locals():
+        importlib.reload(export_properties)
+    if "export_panel_transform" in locals():
+        importlib.reload(export_panel_transform)
+    if "export_panel_data" in locals():
+        importlib.reload(export_panel_data)
+    if "export_panel_animation" in locals():
+        importlib.reload(export_panel_animation)
+    if "GltfExportPreferences" in locals():
+        importlib.reload(GltfExportPreferences)
+    if "GLTF2_filter_action" in locals():
+        importlib.reload(GLTF2_filter_action)
 
 import bpy
 from bpy.app.handlers import persistent
-from bpy.types import Panel, AddonPreferences
-from bpy.props import (
-    StringProperty,
-    PointerProperty,
-    FloatProperty,
-    IntProperty,
-    BoolProperty,
-)
+from bpy.types import Panel
+from bpy.props import StringProperty, PointerProperty, IntProperty
 
 import traceback
 
@@ -83,108 +89,18 @@ required_version = bl_info.get("blender")
 is_blender_version_supported = bpy.app.version >= required_version
 
 
-class RbxAddonPreferences(AddonPreferences):
+from gltf_export_preferences import GltfExportPreferences
+
+
+class RbxAddonPreferences(GltfExportPreferences):
     """AddOnPreferences that are serialized between Blender sessions"""
 
     bl_idname = __name__
-
-    # These properties are not editable via preferences UI, they get reflected to and from properties in memory.
-    # The only token we need to persist is the refresh token, since it gives all new tokens in the next session
     refresh_token: StringProperty()
     selected_creator_enum_index: IntProperty()
 
-    # export_scale is configurable via the Add-on preferences menu in Blender
-    from .lib import constants
-
-    export_scale: FloatProperty(
-        name="Export Scale",
-        default=constants.DEFAULT_EXPORT_SCALE,
-        soft_max=1000,
-        soft_min=0.001,
-        step=0.01,
-        description=f"Global scale applied to objects during export for upload.\nDEFAULT: {constants.DEFAULT_EXPORT_SCALE} (Blender Meters are 100:1 to Studio Studs)",
-    )
-    bake_anim: BoolProperty(
-        name="Baked Animation",
-        description="Export baked keyframe animation",
-        default=True,
-    )
-    bake_anim_use_all_bones: BoolProperty(
-        name="Key All Bones",
-        description="Force exporting at least one key of animation for all bones "
-        "(needed with some target applications, like UE4)",
-        default=True,
-    )
-    bake_anim_use_nla_strips: BoolProperty(
-        name="NLA Strips",
-        description="Export each non-muted NLA strip as a separated FBX's AnimStack, if any, "
-        "instead of global scene animation",
-        default=True,
-    )
-    bake_anim_use_all_actions: BoolProperty(
-        name="All Actions",
-        description="Export each action as a separated FBX's AnimStack, instead of global scene animation "
-        "(note that animated objects will get all actions compatible with them, "
-        "others will get no animation at all)",
-        default=True,
-    )
-    bake_anim_force_startend_keying: BoolProperty(
-        name="Force Start/End Keying",
-        description="Always add a keyframe at start and end of actions for animated channels",
-        default=True,
-    )
-    bake_anim_step: FloatProperty(
-        name="Sampling Rate",
-        description="How often to evaluate animated values (in frames)",
-        min=0.01,
-        max=100.0,
-        soft_min=0.1,
-        soft_max=10.0,
-        default=1.0,
-    )
-    bake_anim_simplify_factor: FloatProperty(
-        name="Simplify",
-        description="How much to simplify baked values (0.0 to disable, the higher the more simplified)",
-        min=0.0,
-        max=100.0,  # No simplification to up to 10% of current magnitude tolerance.
-        soft_min=0.0,
-        soft_max=10.0,
-        default=1.0,  # default: min slope: 0.005, max frame step: 10.
-    )
-    add_leaf_bones: BoolProperty(
-        name="Add Leaf Bones",
-        description="Append a final bone to the end of each chain to specify last bone length (use this when you intend to edit the armature from exported data)",
-        default=True,
-    )
-    use_custom_props: BoolProperty(
-        name="Custom Properties",
-        description="Export Custom Properties",
-        default=True,
-    )
-
     def draw(self, context):
-        self.layout.label(text="Include")
-        include_box = self.layout.box()
-        include_box.prop(self, "use_custom_props")
-
-        self.layout.label(text="Transform")
-        transform_box = self.layout.box()
-        transform_box.prop(self, "export_scale")
-
-        self.layout.label(text="Armature")
-        armature_box = self.layout.box()
-        armature_box.prop(self, "add_leaf_bones")
-
-        self.layout.prop(self, "bake_anim", text="Bake Animation")
-        bake_anim_box = self.layout.box()
-        bake_anim_box.use_property_split = True
-        bake_anim_box.enabled = self.bake_anim
-        bake_anim_box.prop(self, "bake_anim_use_all_bones")
-        bake_anim_box.prop(self, "bake_anim_use_nla_strips")
-        bake_anim_box.prop(self, "bake_anim_use_all_actions")
-        bake_anim_box.prop(self, "bake_anim_force_startend_keying")
-        bake_anim_box.prop(self, "bake_anim_step")
-        bake_anim_box.prop(self, "bake_anim_simplify_factor")
+        GltfExportPreferences.draw(self, context)
 
 
 class RBX_PT_sidebar:
@@ -329,6 +245,7 @@ def get_classes():
     )
     from .lib.install_dependencies import RBX_OT_install_dependencies
     from .lib.upload_operator import RBX_OT_upload
+    from gltf_export_preferences import GLTF2_filter_action
 
     return (
         event_loop.RBX_OT_event_loop,
@@ -343,6 +260,7 @@ def get_classes():
         RBX_PT_upload,
         roblox_properties.RbxStatusProperties,
         roblox_properties.RbxProperties,
+        GLTF2_filter_action,
         RbxAddonPreferences,
     )
 
