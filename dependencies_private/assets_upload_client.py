@@ -1,4 +1,4 @@
-# Copyright © 2023 Roblox Corporation
+# Copyright © 2025 Roblox Corporation
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
 # associated documentation files (the “Software”), to deal in the Software without restriction,
@@ -128,17 +128,21 @@ class AssetsUploadClient:
                 asset_id=asset_id,
                 request=create_request,
                 file_content=file_path,
-                _request_timeout=request_timeout_seconds
-                if request_timeout_seconds > 0
-                else AssetsUploadClient.UPLOAD_ASSET_TIMEOUT_SECONDS,
+                _request_timeout=(
+                    request_timeout_seconds
+                    if request_timeout_seconds > 0
+                    else AssetsUploadClient.UPLOAD_ASSET_TIMEOUT_SECONDS
+                ),
             )
         else:
             operation = await self.asset_client.asset_create(
                 request=create_request,
                 file_content=file_path,
-                _request_timeout=request_timeout_seconds
-                if request_timeout_seconds > 0
-                else AssetsUploadClient.UPLOAD_ASSET_TIMEOUT_SECONDS,
+                _request_timeout=(
+                    request_timeout_seconds
+                    if request_timeout_seconds > 0
+                    else AssetsUploadClient.UPLOAD_ASSET_TIMEOUT_SECONDS
+                ),
             )
 
         operation_id = operation.path[11:]
@@ -157,9 +161,11 @@ class AssetsUploadClient:
 
         return await self.upload_status_client.upload_status_get_operation_status(
             operation_id=operation_id,
-            _request_timeout=request_timeout_seconds
-            if request_timeout_seconds > 0
-            else AssetsUploadClient.GET_ASSET_UPLOAD_STATUS_TIMEOUT_SECONDS,
+            _request_timeout=(
+                request_timeout_seconds
+                if request_timeout_seconds > 0
+                else AssetsUploadClient.GET_ASSET_UPLOAD_STATUS_TIMEOUT_SECONDS
+            ),
         )
 
     async def poll_asset_upload_status_repeated_async(

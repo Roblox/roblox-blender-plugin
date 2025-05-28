@@ -1,4 +1,4 @@
-# Copyright © 2023 Roblox Corporation
+# Copyright © 2025 Roblox Corporation
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
 # associated documentation files (the “Software”), to deal in the Software without restriction,
@@ -20,7 +20,7 @@
 
 
 """
-    Used in Github Actions workflow to automatically update the version number of the plugin to match the tag version
+Used in Github Actions workflow to automatically update the version number of the plugin to match the tag version
 """
 
 import re
