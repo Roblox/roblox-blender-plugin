@@ -20,6 +20,12 @@
 
 import bpy
 import asyncio
+import platform
+
+if platform.system() == "Windows":
+    # aiodns is incompatible with ProactorEventLoop on Windows in some cases.
+    # https://github.com/aio-libs/aiodns?tab=readme-ov-file#note-for-windows-users
+    asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
 loop = asyncio.new_event_loop()
 timer_running = False
