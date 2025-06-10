@@ -1,4 +1,4 @@
-# Copyright © 2023 Roblox Corporation
+# Copyright © 2025 Roblox Corporation
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
 # associated documentation files (the “Software”), to deal in the Software without restriction,
@@ -21,19 +21,19 @@
 name: CI
 
 on:
-  push:
-    branches:
-      - "main"
-  pull_request:
+    push:
+        branches:
+            - "main"
+    pull_request:
 
 jobs:
-  format:
-    runs-on: ubuntu-latest
+    format:
+        runs-on: ubuntu-latest
 
-    steps:
-      - uses: actions/checkout@v3
+        steps:
+            - uses: actions/checkout@v3
 
-      - name: Black Formatting Check
-        run: |
-          python -m pip install black
-          black --check --diff --color .
+            - name: Black Formatting Check
+              run: |
+                  python -m pip install black
+                  black --check --diff --color .

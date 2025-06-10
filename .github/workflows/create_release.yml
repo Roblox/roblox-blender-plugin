@@ -1,4 +1,4 @@
-# Copyright © 2023 Roblox Corporation
+# Copyright © 2025 Roblox Corporation
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
 # associated documentation files (the “Software”), to deal in the Software without restriction,
@@ -21,55 +21,55 @@
 name: Create release
 
 on:
-  push:
-    tags: ["v[0-9]+.[0-9]+.[0-9]+"]
+    push:
+        tags: ["v[0-9]+.[0-9]+.[0-9]+"]
 
 jobs:
-  create-release:
-    name: Create release
-    runs-on: ubuntu-latest
+    create-release:
+        name: Create release
+        runs-on: ubuntu-latest
 
-    outputs:
-      upload_url: ${{ steps.create_release.outputs.upload_url }}
+        outputs:
+            upload_url: ${{ steps.create_release.outputs.upload_url }}
 
-    steps:
-      - name: Create release
-        id: create_release
-        uses: actions/create-release@v1.1.4
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ github.ref_name }}
-          release_name: Release ${{ github.ref_name }}
-          draft: false
-          prerelease: false
+        steps:
+            - name: Create release
+              id: create_release
+              uses: actions/create-release@v1.1.4
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              with:
+                  tag_name: ${{ github.ref_name }}
+                  release_name: Release ${{ github.ref_name }}
+                  draft: false
+                  prerelease: false
 
-  upload-release:
-    needs: ["create-release"]
-    name: Upload release
-    runs-on: ubuntu-latest
+    upload-release:
+        needs: ["create-release"]
+        name: Upload release
+        runs-on: ubuntu-latest
 
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3.0.2
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v3.0.2
 
-      - name: Update plugin version
-        run: python ./.github/scripts/update_version.py ${GITHUB_REF_NAME} ./__init__.py
+            - name: Update plugin version
+              run: python ./.github/scripts/update_version.py ${GITHUB_REF_NAME} ./__init__.py
 
-      - name: Create asset
-        run: |
-          ASSET_NAME=upload-to-roblox-${GITHUB_REF_NAME//./-}
-          echo "asset_name=$ASSET_NAME" >> $GITHUB_ENV
-          DIRECTORY=${PWD##*/}
-          cd ..
-          zip -r $ASSET_NAME.zip $DIRECTORY -i *.py *.dist-info/ $DIRECTORY/requirements.txt -x $DIRECTORY/.github/scripts/*
+            - name: Create asset
+              run: |
+                  ASSET_NAME=upload-to-roblox-${GITHUB_REF_NAME//./-}
+                  echo "asset_name=$ASSET_NAME" >> $GITHUB_ENV
+                  DIRECTORY=${PWD##*/}
+                  cd ..
+                  zip -r $ASSET_NAME.zip $DIRECTORY -i *.py *.dist-info/ $DIRECTORY/requirements.txt -x $DIRECTORY/.github/scripts/*
 
-      - name: Upload asset
-        uses: actions/upload-release-asset@v1.0.2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ needs.create-release.outputs.upload_url }}
-          asset_path: ../${{ env.asset_name }}.zip
-          asset_name: ${{ env.asset_name }}.zip
-          asset_content_type: application/zip
+            - name: Upload asset
+              uses: actions/upload-release-asset@v1.0.2
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              with:
+                  upload_url: ${{ needs.create-release.outputs.upload_url }}
+                  asset_path: ../${{ env.asset_name }}.zip
+                  asset_name: ${{ env.asset_name }}.zip
+                  asset_content_type: application/zip
