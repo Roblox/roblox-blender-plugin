@@ -23,6 +23,8 @@ def str_to_int(string, *, default=None):
     """Returns the integer value of the string if the string is numeric,
     otherwise returns default"""
     try:
+        # TypeError is raised when the string is None.
+        # ValueError is raised when the string is not numeric.
         return int(string)
-    except TypeError:
+    except (ValueError, TypeError):
         return default
