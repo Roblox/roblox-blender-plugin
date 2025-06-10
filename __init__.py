@@ -103,7 +103,22 @@ class RbxAddonPreferences(GltfExportPreferences):
     selected_creator_enum_index: IntProperty()
 
     def draw(self, context):
-        GltfExportPreferences.draw(self, context)
+        from .lib import install_dependencies
+
+        rbx = context.window_manager.rbx
+        if rbx.needs_restart:
+            self.layout.row().label(text="Installation complete!", icon="CHECKMARK")
+            self.layout.row().label(text="Restart Blender to continue.")
+            return
+
+        install_text = "Reinstall" if rbx.is_finished_installing_dependencies else "Install"
+        self.layout.row().operator(
+            install_dependencies.RBX_OT_install_dependencies.bl_idname,
+            text="Installing..." if rbx.is_installing_dependencies else f"{install_text} Dependencies",
+        )
+
+        if rbx.is_finished_installing_dependencies and not rbx.is_installing_dependencies:
+            GltfExportPreferences.draw(self, context)
 
 
 class RBX_PT_sidebar:
@@ -198,7 +213,7 @@ class RBX_PT_creator(RBX_PT_sidebar, Panel):
     @classmethod
     def poll(cls, context):
         rbx = context.window_manager.rbx
-        return rbx.is_logged_in
+        return rbx.is_logged_in and rbx.is_finished_installing_dependencies and not rbx.needs_restart
 
 
 class RBX_PT_upload(RBX_PT_sidebar, Panel):
@@ -226,7 +241,12 @@ class RBX_PT_upload(RBX_PT_sidebar, Panel):
     @classmethod
     def poll(cls, context):
         rbx = context.window_manager.rbx
-        return rbx.is_logged_in and not rbx.is_processing_login_or_logout
+        return (
+            rbx.is_logged_in
+            and rbx.is_finished_installing_dependencies
+            and not rbx.is_processing_login_or_logout
+            and not rbx.needs_restart
+        )
 
 
 @persistent

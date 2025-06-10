@@ -32,6 +32,7 @@ from bpy.types import Operator
 import sys
 import subprocess
 import os
+import shutil
 import ensurepip
 from pathlib import Path
 import traceback
@@ -62,10 +63,19 @@ class RBX_OT_install_dependencies(Operator):
                 task.result()
                 rbx.is_finished_installing_dependencies = True
                 rbx.needs_restart = True
-            except Exception as exception:
-                dependencies_public_directory.rmdir()
-                traceback.print_exception(exception)
+            except Exception as installation_exception:
+                try:
+                    shutil.rmtree(dependencies_public_directory)
+                except Exception as cleanup_exception:
+                    # If public_dependencies can't be cleaned up, this add-on gets into a bad state because it uses
+                    # presence of this directory to determine if dependencies are installed.
+                    # In such a case, the user will either need to manually remove the directory,
+                    # use the Reinstall Dependencies button in addon preferences,
+                    # or reinstall the add-on.
+                    traceback.print_exception(f"Error removing dependencies_public directory: {cleanup_exception}")
+                traceback.print_exception(f"Error installing dependencies: {installation_exception}")
 
+        rbx.is_finished_installing_dependencies = False
         rbx.is_installing_dependencies = True
         event_loop.submit(self.install_dependencies(), on_install_finished)
         return {"FINISHED"}
@@ -96,11 +106,16 @@ class RBX_OT_install_dependencies(Operator):
         stdout, stderr = await process.communicate()
 
         if stdout:
-            print(f"INSTALLATION OUTPUT:\n{stdout.decode()}")
+            print(f"Dependency installation output:\n{stdout.decode(errors='replace')}")
         if stderr:
-            print(f"DEPENDENCY INSTALLATION ERROR:\n{stderr.decode()}")
+            print(f"Dependency installation warnings/errors:\n{stderr.decode(errors='replace')}")
+
+        if process.returncode == 0:
+            print("Dependency installation succeeded!")
+        else:
+            print("Dependency installation failed with exit code {process.returncode}")
 
     @classmethod
     def poll(cls, context):
         rbx = context.window_manager.rbx
-        return not (rbx.is_finished_installing_dependencies or rbx.is_installing_dependencies)
+        return not rbx.is_installing_dependencies
