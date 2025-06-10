@@ -11,19 +11,19 @@ https://github.com/Roblox/roblox-blender-plugin/assets/66378309/ba8b1bd9-e431-40
 ## UNINSTALL OLD VERSION
 1. Navigate to the add-ons menu in Blender at `Edit` > `Preferences` > `Add-ons`
 2. In the top-right search window, search for `Roblox`
-3. If `Upload to Roblox` is present, click the left arrow to expand it and click `Remove` to uninstall it
+3. If `Upload to Roblox` is present, click the left arrow to expand it and click `Uninstall` to uninstall it
 4. Restart Blender after uninstalling
 
 ## INSTALL NEW VERSION
-Prerequisite: Blender version 3.2 or greater is required
+Prerequisite: Blender version 4.4 or greater is required
 
 1. Be sure to [uninstall any old version](#uninstall-old-version) first, including restarting Blender afterward
 2. Download the latest add-on zip file from the [repository releases page](https://github.com/Roblox/roblox-blender-plugin/releases)
 3. Navigate to the add-ons menu in Blender at `Edit` > `Preferences` > `Add-ons`
-4. Click `Install`
-5. Select the **zip file** downloaded above and click `Install Add-on` _(Do not unzip the file!)_
+4. Click the dropdown in the top right and select `Install from Disk`
+5. Select the **zip file** downloaded above and click `Install from Disk` _(Do not unzip the file!)_
 6. In the top-right search window, search for `Roblox`
-7. Find the `Import-Export: Upload to Roblox` add-on in the list, and ensure the checkbox next to its name is checked
+7. Find the `Upload to Roblox` add-on in the list, and ensure the checkbox next to its name is checked
 8. Open the plugin's main panel by going to a 3D window, pressing `N`, and selecting the `Roblox` tab
 9. Click `Install Dependencies`. This is only required the first time the plugin runs
 10. Once it says `Installation complete!`, *restart Blender*
