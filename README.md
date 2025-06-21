@@ -64,7 +64,7 @@ As such, we will *not* be accepting Pull Requests that introduce new features or
 Do either of the following options to install the plugin:
 
 ### OPTION 1: RECOMMENDED VS CODE DEVELOPMENT WORKFLOW
-This option allows you to quickly iterate on the codebase and reload the plugin for testing changes, as well as use a
+This option allows you to quickly iterate on the codebase and reload the plugin for testing changes, as well as use 
 debugger during development.
 1. Be sure to [uninstall any plugin zip file](#uninstall-old-version) first, and then close Blender
 2. Open VS Code as administrator to allow the Blender Development plugin to install a debugger for Blender _(Only need to do this the first time)_
