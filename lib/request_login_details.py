@@ -195,5 +195,5 @@ async def __request_group_names_for_group_ids(group_ids):
                 return {str(group_data["id"]): group_data["name"] for group_data in response_data["data"]}
             except aiohttp.ClientResponseError as exception:
                 for error in response_data.get("errors", []):
-                    exception.message += f"{error['userFacingMessage']}\n"
+                    exception.message += f"{error.get('userFacingMessage', '')}\n"
                 raise exception
