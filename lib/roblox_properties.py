@@ -104,5 +104,6 @@ class RbxProperties(PropertyGroup):
     is_processing_login_or_logout: BoolProperty()
     creators: CollectionProperty(type=creator_details.RbxCreatorData)
     has_called_load_creator: BoolProperty()
+    pending_creator_id: StringProperty()
     num_objects_uploading: IntProperty()
     upload_statuses: CollectionProperty(name="Upload Statuses", type=RbxStatusProperties)
