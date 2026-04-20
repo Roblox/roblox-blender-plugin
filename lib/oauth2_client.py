@@ -71,7 +71,6 @@ from urllib.parse import urlencode, urljoin
 from contextlib import asynccontextmanager
 from time import time
 
-
 PORT = 8181
 HOST = "localhost"
 RESPONSE_TYPE = "code"
