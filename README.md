@@ -11,7 +11,7 @@ https://github.com/Roblox/roblox-blender-plugin/assets/66378309/ba8b1bd9-e431-40
 ## UNINSTALL OLD VERSION
 1. Navigate to the add-ons menu in Blender at `Edit` > `Preferences` > `Add-ons`
 2. In the top-right search window, search for `Roblox`
-3. If `Upload to Roblox` is present, click the left arrow to expand it and click `Remove` to uninstall it
+3. If `Upload to Roblox` is present, click the left arrow to expand it and click `Uninstall` to uninstall it
 4. Restart Blender after uninstalling
 
 ## INSTALL NEW VERSION
@@ -20,10 +20,10 @@ Prerequisite: Blender version 3.2 or greater is required
 1. Be sure to [uninstall any old version](#uninstall-old-version) first, including restarting Blender afterward
 2. Download the latest add-on zip file from the [repository releases page](https://github.com/Roblox/roblox-blender-plugin/releases)
 3. Navigate to the add-ons menu in Blender at `Edit` > `Preferences` > `Add-ons`
-4. Click `Install`
-5. Select the **zip file** downloaded above and click `Install Add-on` _(Do not unzip the file!)_
-6. In the top-right search window, search for `Roblox`
-7. Find the `Import-Export: Upload to Roblox` add-on in the list, and ensure the checkbox next to its name is checked
+4. Click the `⌄` icon in the top-right, then `Install from Disk...`
+5. Select the **zip file** downloaded above and click `Install from Disk` _(Do not unzip the file!)_
+6. In the top search window, search for `Roblox`
+7. Find the `Upload to Roblox` add-on in the list, and ensure the checkbox next to its name is checked
 8. Open the plugin's main panel by going to a 3D window, pressing `N`, and selecting the `Roblox` tab
 9. Click `Install Dependencies`. This is only required the first time the plugin runs
 10. Once it says `Installation complete!`, *restart Blender*
@@ -84,12 +84,17 @@ debugger during development.
 Before marking your pull request as ready for review, please ensure:
 - Your pull request does not introduce new features or functionality
 - All python files are formatted with [black](https://pypi.org/project/black/) and the CI format check is passing
-- Any dependency changes are reflected in `requirements.txt`
+- Any plugin dependency changes are reflected in `requirements.txt`
+- Any dev dependency changes are reflected in `requirements-dev.txt`
 - All commit messages are complete and informative
 - Your Pull Request includes a description of the bug and how your changes fix the bug
 
 ## CONTINUOUS INTEGRATION CHECKS
-Github Actions is set to check that formatting matches [black formatting](https://black.readthedocs.io/en/stable/index.html) before allowing a merge to `main`. Be sure to format your python code with `black` before pushing to avoid being blocked. You can use the VS Code plugin [Black Formatter by Microsoft](https://marketplace.visualstudio.com/items?itemName=ms-python.black-formatter), or run the command line tool by installing it via `pip install black` and then running `black .`
+Github Actions is set to check that formatting matches [black formatting](https://black.readthedocs.io/en/stable/index.html) before allowing a merge to `main`. Be sure to format your python code with `black` before pushing to avoid being blocked.
+
+You can use the VS Code plugin [Black Formatter by Microsoft](https://marketplace.visualstudio.com/items?itemName=ms-python.black-formatter). Though make sure the version of black matches the version in `requirements-dev.text`.
+
+Alternatively run the command line tool by installing it via `pip install -r requirements-dev.txt` and then running `black .`
 
 ## CREATING A RELEASE
 Releases are set up to automatically generate via Github Actions when a tag is added to a commit with the format `v[0-9]+.[0-9]+.[0-9]+`. For example, you can create a release from a commit with SHA `a1b2c3d` by doing the following:
