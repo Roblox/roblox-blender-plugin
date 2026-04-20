@@ -84,12 +84,17 @@ debugger during development.
 Before marking your pull request as ready for review, please ensure:
 - Your pull request does not introduce new features or functionality
 - All python files are formatted with [black](https://pypi.org/project/black/) and the CI format check is passing
-- Any dependency changes are reflected in `requirements.txt`
+- Any plugin dependency changes are reflected in `requirements.txt`
+- Any dev dependency changes are reflected in `requirements-dev.txt`
 - All commit messages are complete and informative
 - Your Pull Request includes a description of the bug and how your changes fix the bug
 
 ## CONTINUOUS INTEGRATION CHECKS
-Github Actions is set to check that formatting matches [black formatting](https://black.readthedocs.io/en/stable/index.html) before allowing a merge to `main`. Be sure to format your python code with `black` before pushing to avoid being blocked. You can use the VS Code plugin [Black Formatter by Microsoft](https://marketplace.visualstudio.com/items?itemName=ms-python.black-formatter), or run the command line tool by installing it via `pip install black` and then running `black .`
+Github Actions is set to check that formatting matches [black formatting](https://black.readthedocs.io/en/stable/index.html) before allowing a merge to `main`. Be sure to format your python code with `black` before pushing to avoid being blocked.
+
+You can use the VS Code plugin [Black Formatter by Microsoft](https://marketplace.visualstudio.com/items?itemName=ms-python.black-formatter). Though make sure the version of black matches the version in `requirements-dev.text`.
+
+Alternatively run the command line tool by installing it via `pip install -r requirements-dev.txt` and then running `black .`
 
 ## CREATING A RELEASE
 Releases are set up to automatically generate via Github Actions when a tag is added to a commit with the format `v[0-9]+.[0-9]+.[0-9]+`. For example, you can create a release from a commit with SHA `a1b2c3d` by doing the following:
