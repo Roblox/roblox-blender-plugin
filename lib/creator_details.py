@@ -93,7 +93,7 @@ def save_creator_details(window_manager, preferences):
                 value = rbx.get(property_name)
 
         if value:
-            add_on_preferences[property_name] = value
+            setattr(add_on_preferences, property_name, value)
         else:
             add_on_preferences.property_unset(property_name)
 
@@ -124,4 +124,4 @@ def load_creator_details(window_manager, preferences):
                 property_to_set = "creator"
 
         # Referencing with brackets to avoid triggering the update function & saving over the rest of the properties with non-loaded data
-        property_holder[property_to_set] = add_on_preferences.get(property_name)
+        property_holder[property_to_set] = getattr(add_on_preferences, property_name, None)
