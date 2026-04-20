@@ -18,12 +18,21 @@
 
 # SPDX-License-Identifier: MIT
 
-from pathlib import Path
-
-# The add on is named after the root folder, so we need to step up the tree
-add_on_name = Path(__file__).parent.parent.name
+# The add-on is registered under its top-level Python package name (see RbxAddonPreferences.bl_idname = __name__
+# in the root __init__.py). In Blender 4.2+/5.x, when an add-on is installed via "Install from Disk" it may be
+# registered through the Extensions system, which means the registered key looks like
+# "bl_ext.user_default.<folder>" rather than the folder name on disk.
+#
+# Deriving the lookup key from the folder name (as this file previously did) therefore breaks under the
+# Extensions system: preferences.addons[<folder>] raises KeyError, save/load of the refresh_token silently
+# fails, and the user is forced to log in every Blender session.
+#
+# Using the top-level package name from a relative import works in both cases and matches the recommended
+# pattern documented at:
+#   https://docs.blender.org/manual/en/latest/advanced/extensions/addons.html#user-preferences-and-package
+from .. import __package__ as _base_package
 
 
 def get_add_on_preferences(preferences):
     """Returns the preferences object for the add-on"""
-    return preferences.addons[add_on_name].preferences
+    return preferences.addons[_base_package].preferences

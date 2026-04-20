@@ -96,8 +96,11 @@ class RbxProperties(PropertyGroup):
     from . import creator_details, install_dependencies
 
     is_installing_dependencies: BoolProperty()
+    # Use dependencies_appear_installed() rather than a bare directory-exists check so we can detect a
+    # stale install left behind by a previous Blender / Python version (e.g. Blender 4.5 → 5.1, where
+    # Python jumps from 3.11 to 3.13 and the existing dependency wheels no longer load).
     is_finished_installing_dependencies: BoolProperty(
-        default=install_dependencies.dependencies_public_directory.exists()
+        default=install_dependencies.dependencies_appear_installed()
     )
     needs_restart: BoolProperty()
     is_logged_in: BoolProperty(update=__on_rbx_property_update)

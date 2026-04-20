@@ -92,14 +92,43 @@ def save_creator_details(window_manager, preferences):
             case _:
                 value = rbx.get(property_name)
 
+        # Write to AddonPreferences via setattr / property_unset rather than the IDProperty interface
+        # ([]= and .get()). In Blender 5.x, AddonPreferences raises
+        #   TypeError: this type doesn't support IDProperties
+        # for the IDProperty interface, even on RNA-declared properties. RNA reflection
+        # (setattr/getattr/property_unset) still persists the value to userpref.blend correctly.
         if value:
-            add_on_preferences[property_name] = value
+            try:
+                setattr(add_on_preferences, property_name, value)
+            except (TypeError, AttributeError):
+                # Defensive: if Blender ever rejects the assignment (e.g. wrong type for the RNA prop),
+                # don't take down the update callback that called us.
+                import traceback
+
+                traceback.print_exc()
         else:
-            add_on_preferences.property_unset(property_name)
+            try:
+                add_on_preferences.property_unset(property_name)
+            except Exception:
+                pass
 
     # Force user preferences to save. This saves preferences for all add-ons which is not ideal,
-    # but is the best workaround we have for now to ensure these details save on close
+    # but is the best workaround we have for now to ensure these details save on close.
     preferences.use_preferences_save = True
+
+    # Setting use_preferences_save only asks Blender to save preferences on exit. That path is unreliable
+    # across Blender versions (notably 4.2+/5.x, where users have reported being forced to log in every
+    # session) and relies on the user not disabling "Auto-Save Preferences". Explicitly persist preferences
+    # to userpref.blend now so the refresh_token survives a restart even if the on-exit save does not run.
+    try:
+        bpy.ops.wm.save_userpref()
+    except Exception:
+        # save_userpref can fail in contexts where it is not allowed (e.g. during some draw/update callbacks
+        # or when preferences are read-only). Persistence-on-exit via use_preferences_save is still in effect
+        # as a fallback, so we swallow the exception rather than breaking login.
+        import traceback
+
+        traceback.print_exc()
 
 
 def load_creator_details(window_manager, preferences):
@@ -112,6 +141,24 @@ def load_creator_details(window_manager, preferences):
     add_on_preferences = get_add_on_preferences(preferences)
 
     for property_name in SAVED_PROPERTY_NAMES:
+        # Read from AddonPreferences via getattr rather than the IDProperty interface (.get() / []).
+        # In Blender 5.x, AddonPreferences raises
+        #   TypeError: this type doesn't support IDProperties
+        # for the IDProperty interface even for RNA-declared properties. is_property_set tells us whether
+        # the user has ever stored a value (so we can distinguish a never-saved StringProperty from one
+        # explicitly stored as the empty string, and skip applying defaults that would overwrite a valid
+        # in-session value).
+        try:
+            is_set = add_on_preferences.is_property_set(property_name)
+        except Exception:
+            is_set = False
+        if not is_set:
+            continue
+        try:
+            value = getattr(add_on_preferences, property_name)
+        except AttributeError:
+            continue
+
         property_holder = rbx
         property_to_set = property_name
         match property_name:
@@ -122,6 +169,13 @@ def load_creator_details(window_manager, preferences):
                 property_holder = oauth2client.token_data
             case "selected_creator_enum_index":
                 property_to_set = "creator"
+                # An IntProperty default is 0, which is a valid creator index. If we have an unset value
+                # there is nothing to apply over the EnumProperty's natural default, so skip rather than
+                # forcing index 0 onto a fresh session.
+                if value is None:
+                    continue
 
-        # Referencing with brackets to avoid triggering the update function & saving over the rest of the properties with non-loaded data
-        property_holder[property_to_set] = add_on_preferences.get(property_name)
+        # Referencing with brackets to avoid triggering the update function & saving over the rest of the
+        # properties with non-loaded data. property_holder is either the rbx PropertyGroup (which supports
+        # the IDProperty interface) or the oauth2_client.token_data dict, both of which accept []= here.
+        property_holder[property_to_set] = value

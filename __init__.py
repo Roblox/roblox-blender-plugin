@@ -65,6 +65,7 @@ from bpy.props import (
     BoolProperty,
 )
 
+import sys
 import traceback
 
 bl_info = {
@@ -225,6 +226,25 @@ class RBX_PT_main(RBX_PT_sidebar, Panel):
         if rbx.needs_restart:
             layout.row().label(text="Installation complete!", icon="CHECKMARK")
             layout.row().label(text="Restart Blender to continue.")
+            return
+
+        # Runtime canary: dependencies_public exists (so is_finished_installing_dependencies is True) but
+        # the critical wheel won't import. This typically means the user upgraded Blender to a release that
+        # ships a different Python version than the one their dependencies were built for. Prompt a clean
+        # reinstall rather than letting them hit a silent ModuleNotFoundError when they click Log in.
+        # Note: do not mutate rbx state from draw() — Blender disallows it. The install operator's poll
+        # now permits re-running while not actively installing, so the button is enabled here.
+        if not install_dependencies.dependencies_importable():
+            layout.row().label(text="Dependencies need to be reinstalled.", icon="ERROR")
+            layout.row().label(
+                text=f"They appear incompatible with Python {sys.version_info.major}.{sys.version_info.minor}.",
+                icon="DOT",
+            )
+            layout.row().label(text="(Likely after a Blender version upgrade.)", icon="DOT")
+            layout.row().operator(
+                install_dependencies.RBX_OT_install_dependencies.bl_idname,
+                text="Installing..." if rbx.is_installing_dependencies else "Reinstall Dependencies",
+            )
             return
 
         # Blender does not provide an API for us to hook into to read the creator details when
