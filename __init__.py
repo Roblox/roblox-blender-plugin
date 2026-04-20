@@ -87,7 +87,7 @@ class RbxAddonPreferences(AddonPreferences):
     # These properties are not editable via preferences UI, they get reflected to and from properties in memory.
     # The only token we need to persist is the refresh token, since it gives all new tokens in the next session
     refresh_token: StringProperty()
-    selected_creator_enum_index: IntProperty()
+    selected_creator_id: StringProperty()
 
     # export_scale is configurable via the Add-on preferences menu in Blender
     from .lib import constants

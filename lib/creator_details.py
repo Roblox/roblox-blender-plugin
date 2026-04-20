@@ -35,7 +35,7 @@ from bpy.props import StringProperty, EnumProperty
 
 # The properties from the rbx object that are to be loaded from / saved to Add-on preferences
 SAVED_PROPERTY_NAMES = [
-    "selected_creator_enum_index",
+    "selected_creator_id",
     "refresh_token",
 ]
 
@@ -76,26 +76,26 @@ def save_creator_details(window_manager, preferences):
     rbx = window_manager.rbx
 
     for property_name in SAVED_PROPERTY_NAMES:
-        match property_name:
-            case "refresh_token":
-                from .oauth2_client import RbxOAuth2Client
+        try:
+            match property_name:
+                case "refresh_token":
+                    from .oauth2_client import RbxOAuth2Client
 
-                oauth2client = RbxOAuth2Client(rbx)
-                value = oauth2client.token_data.get(property_name)
-            case "selected_creator_enum_index":
-                # Reading an EnumProperty with . gives the identifier. Reading it with [] or .get() gives the enum index.
-                # Setting a Blender RNA property with . triggers the updated event callbacks. Setting it with [] does not.
-                # Later, when loading these properties, we need to avoid triggering updated events until all properties are loaded,
-                # so it uses brackets to set properties. This means for EnumProperties, it is setting it by enum index rather than identifier.
-                # So, we use .get() here to save the enum index. This also applies to any other enums we save.
-                value = rbx.get("creator")
-            case _:
-                value = rbx.get(property_name)
+                    oauth2client = RbxOAuth2Client(rbx)
+                    value = oauth2client.token_data.get(property_name)
+                case "selected_creator_id":
+                    # Use attribute access to get the enum identifier string (Blender 5.0+ removed
+                    # dict-style access on bpy.props-defined properties)
+                    value = getattr(rbx, "creator", "")
+                case _:
+                    value = getattr(rbx, property_name, None)
 
-        if value:
-            add_on_preferences[property_name] = value
-        else:
-            add_on_preferences.property_unset(property_name)
+            if value:
+                setattr(add_on_preferences, property_name, value)
+            else:
+                add_on_preferences.property_unset(property_name)
+        except Exception as exception:
+            print(f"Failed to save preference '{property_name}': {exception}")
 
     # Force user preferences to save. This saves preferences for all add-ons which is not ideal,
     # but is the best workaround we have for now to ensure these details save on close
@@ -112,16 +112,18 @@ def load_creator_details(window_manager, preferences):
     add_on_preferences = get_add_on_preferences(preferences)
 
     for property_name in SAVED_PROPERTY_NAMES:
-        property_holder = rbx
-        property_to_set = property_name
+        value = getattr(add_on_preferences, property_name, None)
+        if not value:
+            continue
+
         match property_name:
             case "refresh_token":
                 from .oauth2_client import RbxOAuth2Client
 
                 oauth2client = RbxOAuth2Client(rbx)
-                property_holder = oauth2client.token_data
-            case "selected_creator_enum_index":
-                property_to_set = "creator"
-
-        # Referencing with brackets to avoid triggering the update function & saving over the rest of the properties with non-loaded data
-        property_holder[property_to_set] = add_on_preferences.get(property_name)
+                oauth2client.token_data[property_name] = value
+            case "selected_creator_id":
+                # Defer creator selection until after login when enum items are available.
+                # Setting rbx.creator directly here would fail (no enum items yet) and would
+                # trigger the update callback prematurely.
+                rbx.pending_creator_id = value

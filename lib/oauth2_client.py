@@ -249,10 +249,21 @@ class RbxOAuth2Client:
                 self.__complete_login(*await request_login_details(new_token_data))
 
     def __complete_login(self, creator_ids, name, group_names_by_id, token_data):
+        # Preserve creator selection across list refresh. On first login, pending_creator_id
+        # holds the value loaded from saved preferences. On token refresh, rbx.creator holds
+        # the user's current selection.
+        previous_creator_id = getattr(self.rbx, "creator", "") or self.rbx.pending_creator_id
+        self.rbx.pending_creator_id = ""
+
         # Set state values in rbx from the data fetched and processed above
         self.__set_creators_from_ids(creator_ids, name, group_names_by_id)
         self.name = name
         self.token_data = token_data
+
+        # Restore creator selection if the previously selected creator still exists
+        if previous_creator_id and any(c.id == previous_creator_id for c in self.rbx.creators):
+            self.rbx.creator = previous_creator_id
+
         self.rbx.is_logged_in = True
 
     @staticmethod
