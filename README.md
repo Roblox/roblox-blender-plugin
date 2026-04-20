@@ -85,7 +85,7 @@ Before marking your pull request as ready for review, please ensure:
 - Your pull request does not introduce new features or functionality
 - All python files are formatted with [black](https://pypi.org/project/black/) and the CI format check is passing
 - Any plugin dependency changes are reflected in `requirements.txt`
-- Any cev dependency changes are reflected in `requirements-dev.txt`
+- Any dev dependency changes are reflected in `requirements-dev.txt`
 - All commit messages are complete and informative
 - Your Pull Request includes a description of the bug and how your changes fix the bug
 
