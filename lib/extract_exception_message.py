@@ -19,9 +19,9 @@
 # SPDX-License-Identifier: MIT
 
 """
-    Some API responses contain a string body, and others contain a json
-    body with a Message entry. This returns the message, regardless of either
-    response type.
+Some API responses contain a string body, and others contain a json
+body with a Message entry. This returns the message, regardless of either
+response type.
 """
 
 import json

@@ -19,8 +19,8 @@
 # SPDX-License-Identifier: MIT
 
 """
-    Returns objects selected in any outliner by the user, only including "uploadable" objects.
-    For a collection to be selectable, it must contain an uploadable descendant.
+Returns objects selected in any outliner by the user, only including "uploadable" objects.
+For a collection to be selectable, it must contain an uploadable descendant.
 """
 
 import bpy
