@@ -37,6 +37,7 @@ import bpy
 import asyncio
 import json
 import urllib
+import logging
 
 
 class StateMismatchError(Exception):
@@ -96,39 +97,45 @@ class AuthCallbackRequestHandler:
             return self.__get_success_response()
         except StateMismatchError as exception:
             event.exception = exception
+            logging.info("State parameter mismatch during authentication: %s", exception)
             return self.__get_error_response(
                 401,
                 "Error: State parameter mismatch.",
             )
         except MissingAuthCodeError as exception:
             event.exception = exception
+            logging.exception("Missing authentication code during login.")
             return self.__get_error_response(
                 500,
-                f"Error: No authentication code received.\n{str(exception)}",
+                "Error: No authentication code received.",
             )
         except json.JSONDecodeError as exception:
             event.exception = exception
+            logging.exception("Server response was not valid JSON during login.")
             return self.__get_error_response(
                 500,
-                f"Error: Server's response was not valid JSON.\n{str(exception)}\n{exception.doc}",
+                "Error: Server's response was not valid JSON.",
             )
         except aiohttp.ClientResponseError as exception:
             event.exception = exception
+            logging.exception("Login request failed with a server response error.")
             return self.__get_error_response(
                 exception.status,
-                f"Error: Login request failed.\n{str(exception)}",
+                "Error: Login request failed due to a server error.",
             )
         except aiohttp.ClientError as exception:
             event.exception = exception
+            logging.exception("Login request failed due to a client or network error.")
             return self.__get_error_response(
                 500,
-                f"Login request failed.\n{str(exception)}",
+                "Error: Login request failed due to a network error.",
             )
         except Exception as exception:
             event.exception = exception
+            logging.exception("Internal client error during login.")
             return self.__get_error_response(
                 500,
-                f"Internal client error.\n{str(exception)}",
+                "Internal client error.",
             )
         finally:
             # Fire the event to let the login function resume
